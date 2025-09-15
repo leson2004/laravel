@@ -60,5 +60,12 @@ class CartController extends Controller
 
         return redirect()->route('user.cart.index')->with('success', 'Sản phẩm đã được xóa khỏi giỏ hàng.');
     }
+    // Xóa toàn bộ giỏ hàng
+    public function clear()
+    {
+        session()->forget('cart'); // Xóa cart trong session
+        return redirect()->route('user.cart.index')->with('success', 'Đã xóa toàn bộ giỏ hàng.');
+    }
+
 }
 
