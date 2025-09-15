@@ -18,12 +18,16 @@ class OrderController extends Controller
     // Cập nhật trạng thái đơn hàng
     public function updateStatus(Request $request, $id)
     {
+        $request->validate([
+            'status' => 'required|in:pending,processing,paid,failed',
+        ]);
+
         $order = Orders::findOrFail($id);
-        $order->status = $request->status; // 'processing', 'paid', 'cancelled'
+        $order->status = $request->status;
         $order->save();
 
         return redirect()->route('admin.orders.index')
-                         ->with('success', 'Cập nhật trạng thái đơn hàng thành công!');
+                        ->with('success', 'Cập nhật trạng thái đơn hàng thành công!');
     }
 
     // ✅ Xem chi tiết đơn hàng

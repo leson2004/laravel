@@ -71,11 +71,11 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="name" class="form-label">Họ tên người nhận</label>
-                            <input type="text" name="name" id="name" class="form-control" required>
+                            <input type="text" name="name" id="name" class="form-control"  value="{{ $user->name }}" readonly>
                         </div>
                         <div class="col-md-6">
                             <label for="phone" class="form-label">Số điện thoại</label>
-                            <input type="text" name="phone" id="phone" class="form-control" required>
+                            <input type="text" name="phone" id="phone" class="form-control"  required>
                         </div>
                     </div>
 

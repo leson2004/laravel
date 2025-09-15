@@ -37,9 +37,10 @@
                                 @csrf
                                 @method('PATCH')
                                 <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>🕒 Chờ thanh toán</option>
                                     <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>⏳ Đang xử lý</option>
                                     <option value="paid" {{ $order->status == 'paid' ? 'selected' : '' }}>✅ Đã thanh toán</option>
-                                    <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>❌ Đã hủy</option>
+                                    <option value="failed" {{ $order->status == 'failed' ? 'selected' : '' }}>❌ Thất bại</option>
                                 </select>
                             </form>
                         </td>

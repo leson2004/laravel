@@ -40,11 +40,13 @@
                                 </td>
                                 <td>
                                     @if($order->status == 'pending')
-                                        <span class="badge bg-warning text-dark">Chờ xử lý</span>
-                                    @elseif($order->status == 'completed')
-                                        <span class="badge bg-success">Hoàn tất</span>
+                                        <span class="badge bg-warning text-dark">Chờ thanh toán</span>
+                                    @elseif($order->status == 'processing')
+                                        <span class="badge bg-info text-dark">Đang xử lý (COD)</span>
+                                    @elseif($order->status == 'paid')
+                                        <span class="badge bg-success">Đã thanh toán</span>
                                     @elseif($order->status == 'failed')
-                                        <span class="badge bg-danger">Thất bại</span>
+                                        <span class="badge bg-danger">Thanh toán thất bại</span>
                                     @else
                                         <span class="badge bg-secondary">{{ $order->status }}</span>
                                     @endif
@@ -57,9 +59,9 @@
                                     </a>
 
                                     {{-- Nếu MoMo thất bại → cho thanh toán lại --}}
-                                    @if($order->status == 'failed')
+                                    @if($order->status == 'failed' && $order->payment_method == 'momo')
                                         <a href="{{ route('orders.momo.pay', $order->id) }}" 
-                                           class="btn btn-sm btn-outline-warning">
+                                        class="btn btn-sm btn-outline-warning">
                                             Thanh toán lại
                                         </a>
                                     @endif

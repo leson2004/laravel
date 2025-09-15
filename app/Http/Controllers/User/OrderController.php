@@ -27,7 +27,8 @@ $cart = session('cart', []);
 if (empty($cart)) {
 return redirect()->route('user.cart.index')->with('error', 'Giỏ hàng của bạn đang trống.');
 }
-return view('user.payment.index', compact('cart'));
+ $user = Auth::user(); // lấy thông tin user
+    return view('user.payment.index', compact('cart', 'user'));
 }
 // nhận thao tác thanh toán từ form rồi điều hướng kết quả momo hay COD
 public function processPayment(Request $request)
@@ -56,9 +57,9 @@ $order = Orders::create([
 'address' => $request->address,
 'phone' => $request->phone,
 'total_price' => $total,
-'status' => 'chờ thanh toán',
+'status' => 'pending', // mặc định chờ thanh toán
 // Nếu DB có cột payment_method/payment_status thì mở 2 dòng dưới:
-// 'payment_method' => $request->payment_method,
+'payment_method' => $request->payment_method,
 // 'payment_status' => 'unpaid',
 ]);
 // Lưu chi tiết đơn
@@ -77,12 +78,14 @@ session()->forget('cart');
 // Rẽ nhánh phương thức
 if ($request->payment_method === 'momo') {
 // (tuỳ chọn) nếu muốn phản ánh trạng thái đang thanh toán:
-// $order->update(['status' => 'đang thanh toán (MoMo)']);
+$order->update([ 'status' => 'pending',
+        'payment_method' => 'momo']);
 return $this->redirectToMoMo($order);
 }
 // COD
 $order->update([
-'status' => 'đã đặt (COD)',
+    'status' => 'processing',
+    'payment_method' => 'cod'
 // Nếu có cột payment_status:
 // 'payment_status' => 'unpaid',
 ]);
@@ -183,7 +186,11 @@ if ($resultCode === '0' || $resultCode === 0) {
 // ✅ Thành công: xoá giỏ + cập nhật trạng thái đơn
 session()->forget('cart');
 if ($order) {
-$order->update(['status' => 'đã thanh toán (MoMo)']);
+$order->update([
+    'status' => 'paid',
+    'payment_method' => 'momo' // 👈 đảm bảo không bị mặc định cod
+    //'payment_status' => 'paid',
+]);
 }
 return redirect()->route('user.orders.index')
 
@@ -214,9 +221,9 @@ $parts = explode('_', $request->orderId);
 $orderId = end($parts);
 if ($order = Orders::find($orderId)) {
 if ((string)($request->resultCode) === '0') {
-$order->update(['status' => 'đã thanh toán (MoMo)']);
+$order->update(['status' => 'paid']);
 } else {
-$order->update(['status' => 'thanh toán thất bại (MoMo)']);
+$order->update(['status' => 'failed']);
 }
 }
 }
@@ -229,11 +236,11 @@ if ($order->user_id !== Auth::id()) {
 abort(403, 'Bạn không có quyền thanh toán lại đơn này.');
 
 }
-if ($order->status === 'đã thanh toán (MoMo)') {
+if ($order->status === 'paid') {
 return redirect()->route('user.orders.index')->with('info', 'Đơn này đã thanh toán.');
 }
 // Đưa về “chờ thanh toán” trước khi tạo giao dịch mới (tuỳ bạn)
-$order->update(['status' => 'chờ thanh toán']);
+$order->update(['status' => 'pending']);
 // PHẢI return
 return $this->redirectToMoMo($order);
 }

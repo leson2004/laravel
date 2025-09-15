@@ -10,11 +10,11 @@
 <div class="row">
 <div class="col-md-6">
 <label for="name">Họ và tên</label>
-<input type="text" name="name" id="name" class="form-control" required>
+<input type="text" name="name" id="name" class="form-control" value="{{ $user->name }}" readonly>
 </div>
 <div class="col-md-6">
 <label for="phone">Số điện thoại</label>
-<input type="text" name="phone" id="phone" class="form-control" required>
+<input type="text" name="phone" id="phone" class="form-control" value="{{ $user->phone }}" readonly>
 </div>
 <div class="col-md-12 mt-3">
 <label for="address">Địa chỉ giao hàng</label>
